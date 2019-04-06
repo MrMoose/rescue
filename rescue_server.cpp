@@ -11,6 +11,8 @@
 #include "tools/Error.hpp"
 
 #include <boost/config.hpp>
+#include <boost/thread.hpp>
+#include <boost/asio.hpp>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 
@@ -28,6 +30,10 @@ using namespace moose::tools;
 using namespace moose::rescue;
 
 namespace fs = boost::filesystem;
+
+
+
+
 
 
 

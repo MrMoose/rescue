@@ -9,3 +9,9 @@ target_link_libraries(TestInput librescue Boost::unit_test_framework)
 add_executable(TestParser TestParser.cpp)
 target_link_libraries(TestParser librescue Boost::unit_test_framework)
 
+add_executable(TestEnc TestEnc.cpp)
+target_link_libraries(TestEnc librescue Boost::unit_test_framework)
+
+add_executable(TestSha512 TestSha512.cpp)
+target_link_libraries(TestSha512 librescue Boost::unit_test_framework)
+

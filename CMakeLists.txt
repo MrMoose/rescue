@@ -12,14 +12,20 @@ set(RESCUE_SRC
 	Types.cpp
 	InputParser.cpp
 	InputGenerator.cpp
-	)
+	WorkQueue.cpp
+	XorEnc.cpp
+	Sha512.cpp
+)
 
 set(RESCUE_HDR
 	RescueConfig.hpp
 	Types.hpp
 	InputParser.hpp
 	InputGenerator.hpp
-	)
+	WorkQueue.hpp
+	XorEnc.hpp
+	Sha512.hpp
+)
 
 add_library(librescue ${RESCUE_SRC} ${RESCUE_HDR})
 if (${BUILD_SHARED_LIBS})
@@ -28,10 +34,10 @@ endif()
 
 target_link_libraries(librescue
 	PUBLIC
-	    moose_tools
+		moose_tools
 		Boost::boost
 	PRIVATE
-	    mredis
+		mredis
 		Boost::thread
 		Boost::system
 )
@@ -45,6 +51,7 @@ target_include_directories(librescue
 )
 
 set(RESCUE_SERVER_SRC
+	rescue_server.cpp
 	RescueServer.cpp
 	)
 
@@ -86,4 +93,8 @@ target_link_libraries(rescue_client
 add_subdirectory(test)
 enable_testing()
 add_test(NAME Input     COMMAND TestInput     )
+add_test(NAME Parser    COMMAND TestParser    )
+add_test(NAME Enc       COMMAND TestEnc       )
+add_test(NAME Sha512    COMMAND TestSha512    )
+
 
