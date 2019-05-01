@@ -13,9 +13,13 @@
 
 #include <set>
 #include <iostream>
+#include <vector>
+#include <string>
 
 using namespace moose::tools;
 using namespace moose::rescue;
+
+#if defined RESCUE_ALNUM_TOKEN_PERMUTATIONS_ALL_LETTERS
 
 BOOST_AUTO_TEST_CASE(OneStringPerms) {
 
@@ -37,6 +41,27 @@ BOOST_AUTO_TEST_CASE(OneStringPerms) {
 	BOOST_CHECK(perms[7] == "HEL");
 }
 
+#elif defined RESCUE_ALNUM_TOKEN_PERMUTATIONS_FIRST_LETTER_ONLY
+
+BOOST_AUTO_TEST_CASE(OneStringPerms) {
+
+	const std::string input("hEl");
+
+	std::vector<std::string> perms;
+
+	BOOST_REQUIRE_NO_THROW(case_permutations(input, perms));
+
+	BOOST_CHECK(perms.size() == 2);
+
+	BOOST_CHECK(perms[0] == "HEl");
+	BOOST_CHECK(perms[1] == "hEl");
+}
+
+#else
+    #pragma message ("Alnum token behavior undefined.")
+#endif
+
+
 BOOST_AUTO_TEST_CASE(Diverse) {
 
 	const std::string input("Hi [wo|rl]!");
@@ -48,5 +73,13 @@ BOOST_AUTO_TEST_CASE(Diverse) {
 	// Well, I don't know how I could simulate an expected result.
 	// by looking at it and considering it reasonable I
 	// think it should suffice to check for 384 items
+#if defined RESCUE_ALNUM_TOKEN_PERMUTATIONS_ALL_LETTERS
+
 	BOOST_CHECK(perms.size() == 384);
+
+#elif defined RESCUE_ALNUM_TOKEN_PERMUTATIONS_FIRST_LETTER_ONLY
+
+	BOOST_CHECK(perms.size() == 96);
+
+#endif
 }

@@ -4,6 +4,7 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "InputGenerator.hpp"
+#include "WorkQueue.hpp"
 
 #include "mredis/AsyncClient.hpp"
 
@@ -64,8 +65,8 @@ int main(int argc, char **argv) {
 		const std::string server_ip_string = vm["server"].as<std::string>();
 
 		// Connect to the redis backend to enter the candidate strings
-		AsyncClient redis(server_ip_string);
-		redis.connect();
+		AsyncClientSPtr redis{ std::make_shared<AsyncClient>(server_ip_string) };
+		redis->connect();
 
 		const fs::path infile(vm["file"].as<std::string>());
 
@@ -79,17 +80,33 @@ int main(int argc, char **argv) {
 
 		for (std::string line; std::getline(ifile, line); ) {
 
-			std::cout << "input: " << line;
+			std::cout << "Crunching input: " << line << std::endl;
 
 			std::vector<std::string> permutations;
-
 			std::size_t num = generate_permutations(line, permutations);
-			std::cout << " yielded " << num << " permutations" << std::endl;
+			std::cout << " yielded " << num << " permutations. Inserting them into Q...." << std::endl;
 
 			for (const std::string &candidate : permutations) {
+				std::cout << "queing " << candidate << std::endl;
+				queue_candidate(redis, candidate);
+			}
 
+			// Now do that again with an added tokens "Master"
+			permutations.clear();
+			num = generate_permutations(line + " [Master|Slave]", permutations);
+			std::cout << " yielded " << num << " permutations plus 'Master'. Inserting them into Q...." << std::endl;
+			for (const std::string &candidate : permutations) {
+				std::cout << "queing " << candidate << std::endl;
+				queue_candidate(redis, candidate);
+			}
 
+			permutations.clear();
+			num = generate_permutations(line + " [Master|Slave] 1", permutations);
+			std::cout << " yielded " << num << " permutations plus 'Master'. Inserting them into Q...." << std::endl;
 
+			for (const std::string &candidate : permutations) {
+				std::cout << "queing " << candidate << std::endl;
+				queue_candidate(redis, candidate);
 			}
 		}
 

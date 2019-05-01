@@ -22,10 +22,12 @@ namespace rescue {
 /* create all upper and lowercase permutations of a string */
 void case_permutations(const std::string &n_input, std::vector<std::string> &n_output) {
 
+#if defined RESCUE_ALNUM_TOKEN_PERMUTATIONS_ALL_LETTERS
+
 	std::locale loc;
 
 	// Now we're gonna create a lot of strings
-	const std::uint64_t permutations = std::pow(2, n_input.size());
+	const std::uint64_t permutations = static_cast<std::uint64_t>(std::pow(2, n_input.size()));
 
 	for (unsigned int i = 0; i < permutations; i++) {
 
@@ -42,15 +44,30 @@ void case_permutations(const std::string &n_input, std::vector<std::string> &n_o
 			}
 		}
 
-		n_output.push_back(permutation);
+		n_output.emplace_back(permutation);
 	}
+
+#elif defined RESCUE_ALNUM_TOKEN_PERMUTATIONS_FIRST_LETTER_ONLY
+
+	std::locale loc;
+
+	std::string uppercase = n_input;
+	std::string lowercase = n_input;
+
+	uppercase[0] = std::toupper(uppercase[0], loc);
+	lowercase[0] = std::tolower(lowercase[0], loc);
+
+	n_output.emplace_back(uppercase);
+	n_output.emplace_back(lowercase);
+
+#else
+    #pragma message ("Alnum token behavior undefined.")
+#endif
 }
 
 class TokenVisitor : boost::static_visitor<> {
 
 	public:
-//		TokenVisitor(std::vector<std::string> &n_dst) : m_dst(n_dst) {}
-
 		void operator()(const std::string &n_string_token) {
 
 			case_permutations(n_string_token, m_dst);
@@ -115,12 +132,16 @@ std::vector<std::string> recurse_permutations(const std::list<token> &n_remains)
 }
 
 
+
+
+
+
+
 std::size_t generate_permutations(const std::string &n_input, std::vector<std::string> &n_output) {
 
-	std::list<token> tokens = parse_input_string(n_input);
+	const std::list<token> tokens = parse_input_string(n_input);
 
 	// Now that I have a vector of tokens, iterate and generate output for each
-
 	n_output = recurse_permutations(tokens);
 
 	return n_output.size();

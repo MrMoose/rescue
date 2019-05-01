@@ -4,6 +4,18 @@
 
 #pragma once
 
+// When generating permutations of alphanumeric tokens,
+// define this to only have upper and lowercase variations of the first
+// letter, the rest will be as it is
+#define RESCUE_ALNUM_TOKEN_PERMUTATIONS_FIRST_LETTER_ONLY
+
+// When generating permutations of alphanumeric tokens,
+// define this to have all letters in upper and lower case
+// variants.
+// Warning: This is way more permutations than you may think
+// #define RESCUE_ALNUM_TOKEN_PERMUTATIONS_ALL_LETTERS
+
+
 // see https://gcc.gnu.org/wiki/Visibility
 
 // Generic helper definitions for shared library support

@@ -4,14 +4,14 @@
 # LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_executable(TestInput TestInput.cpp)
-target_link_libraries(TestInput librescue Boost::unit_test_framework)
+target_link_libraries(TestInput rescue Boost::unit_test_framework)
 
 add_executable(TestParser TestParser.cpp)
-target_link_libraries(TestParser librescue Boost::unit_test_framework)
+target_link_libraries(TestParser rescue Boost::unit_test_framework)
 
 add_executable(TestEnc TestEnc.cpp)
-target_link_libraries(TestEnc librescue Boost::unit_test_framework)
+target_link_libraries(TestEnc rescue Boost::unit_test_framework)
 
 add_executable(TestSha512 TestSha512.cpp)
-target_link_libraries(TestSha512 librescue Boost::unit_test_framework)
+target_link_libraries(TestSha512 rescue Boost::unit_test_framework)
 

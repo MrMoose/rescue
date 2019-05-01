@@ -1,9 +1,9 @@
 
-//  Copyright 2018 Stephan Menzel. Distributed under the Boost
+//  Copyright 2019 Stephan Menzel. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include "InputGenerator.hpp"
+#include "RescueServer.hpp"
 
 #include "mredis/AsyncClient.hpp"
 
@@ -32,11 +32,6 @@ using namespace moose::rescue;
 namespace fs = boost::filesystem;
 
 
-
-
-
-
-
 int main(int argc, char **argv) {
 	
 #ifndef _WIN32
@@ -50,7 +45,7 @@ int main(int argc, char **argv) {
 
 	namespace po = boost::program_options;
 
-	po::options_description desc("rescue client options");
+	po::options_description desc("rescue server options");
 	desc.add_options()
 	    ("help,h",   "Print this help message")
 	    ("server,s", po::value<std::string>()->default_value("127.0.0.1"), "give redis server ip")
@@ -68,43 +63,23 @@ int main(int argc, char **argv) {
 		}
 
 		const std::string server_ip_string = vm["server"].as<std::string>();
+		const boost::filesystem::path filename = vm["file"].as<std::string>();
 
-		// Connect to the redis backend to enter the candidate strings
-		AsyncClient redis(server_ip_string);
-		redis.connect();
+		// Check the file for accessibility
+		boost::system::error_code errc;
 
-		const fs::path infile(vm["file"].as<std::string>());
-
-		if (!fs::exists(infile)) {
-			std::cerr << "Input file " << infile << " does not exist" << std::endl;
+		if (fs::is_regular_file(filename, errc) || errc) {
+			std::cerr << "Could not access LUKS header file '" << filename << "': " << errc;
 			return EXIT_FAILURE;
 		}
 
-		// Open input file and read line by line, parse and enter into work queue
-		fs::ifstream ifile(infile, std::ios::in);
-
-		for (std::string line; std::getline(ifile, line); ) {
-
-			std::cout << "input: " << line;
-
-			std::vector<std::string> permutations;
-
-			std::size_t num = generate_permutations(line, permutations);
-			std::cout << " yielded " << num << " permutations" << std::endl;
-
-			for (const std::string &candidate : permutations) {
-
-
-
-			}
-		}
-
-		std::cout << "done" << std::endl;
+		RescueServer server(server_ip_string);
+		server.run(filename);
 
 		return EXIT_SUCCESS;
 
 	} catch (const moose_error &merr) {
-		std::cerr << "Exception executing test cases: " << boost::diagnostic_information(merr) << std::endl;
+		std::cerr << "Exception executing rescue server: " << boost::diagnostic_information(merr) << std::endl;
 	} catch (const boost::system::error_code &errc) {
 		std::cerr << "Exception processing: " << boost::diagnostic_information(errc) << std::endl;
 	} catch (const std::exception &sex) {

@@ -1,4 +1,4 @@
-// Copyright 2018 Stephan Menzel. Distributed under the Boost
+// Copyright 2019 Stephan Menzel. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,39 +10,38 @@
 #include "tools/Macros.hpp"
 
 #include <boost/thread.hpp>
-#include <boost/asio.hpp>
+#include <boost/filesystem.hpp>
 
 #include <memory>
+#include <string>
 
 namespace moose {
 namespace rescue {
 
-//! @brief Primary stage server component.
-//! 
+/*! @brief Primary rescue server component.
+ * Spawns as many threads as cores are available and has them poll
+ * the work queue and work upon extracted items
+ */
 class RescueServer final {
 
 	public:
 		/*! @brief create the server object
 
 		 */
-		RESCUE_API RescueServer();
+		RESCUE_API RescueServer(const std::string &n_redis_server);
 
 		//! shut down everything
 		RESCUE_API ~RescueServer() noexcept;
 		
 		//! start server and block until signal is received
-		RESCUE_API void run();
+		RESCUE_API void run(const boost::filesystem::path &n_luks_file);
 
 		//! shut down anyway
 		RESCUE_API void shutdown();
 
 	private:
-
-		/// See if some asio can be used to keep the server alive until signal
-		boost::asio::io_context     m_io_context;          //!< runs pretty much everything. Implicit strand, do not add threads!
-		boost::asio::signal_set     m_signals;
-
-		moose::mredis::AsyncClientSPtr m_redis;            //!< only set in cloud environment
+		boost::thread_group            m_workers;
+		moose::mredis::AsyncClientSPtr m_redis;    // globally used by all workers
 };
 
 } // namespace rescue

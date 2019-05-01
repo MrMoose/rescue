@@ -15,6 +15,7 @@ set(RESCUE_SRC
 	WorkQueue.cpp
 	XorEnc.cpp
 	Sha512.cpp
+	BruteForceLuks.cpp
 )
 
 set(RESCUE_HDR
@@ -25,14 +26,21 @@ set(RESCUE_HDR
 	WorkQueue.hpp
 	XorEnc.hpp
 	Sha512.hpp
+	BruteForceLuks.hpp
 )
 
-add_library(librescue ${RESCUE_SRC} ${RESCUE_HDR})
+# Find cryptsetup in order to include it.
+# This of course makes us platform dependent
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(CRYPTSETUP REQUIRED libcryptsetup)
+
+
+add_library(rescue ${RESCUE_SRC} ${RESCUE_HDR})
 if (${BUILD_SHARED_LIBS})
-	target_compile_definitions(librescue PUBLIC -DRESCUE_DLL)
+	target_compile_definitions(rescue PUBLIC -DRESCUE_DLL)
 endif()
 
-target_link_libraries(librescue
+target_link_libraries(rescue
 	PUBLIC
 		moose_tools
 		Boost::boost
@@ -40,12 +48,14 @@ target_link_libraries(librescue
 		mredis
 		Boost::thread
 		Boost::system
+		${CRYPTSETUP_LIBRARIES}
 )
 
-target_include_directories(librescue
+target_include_directories(rescue
    PUBLIC
-        $<INSTALL_INTERFACE:librescue>
+        $<INSTALL_INTERFACE:rescue>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+        ${CRYPTSETUP_INCLUDE_DIRS}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
@@ -66,7 +76,7 @@ endif()
 
 target_link_libraries(rescue_server
 	PUBLIC
-	    librescue
+	    rescue
 		moose_tools
 		Boost::boost
 	PRIVATE
@@ -85,7 +95,7 @@ target_include_directories(rescue_server
 
 add_executable(rescue_client rescue_client.cpp)
 target_link_libraries(rescue_client
-	librescue
+	rescue
 	mredis
 	Boost::program_options
 )
