@@ -69,20 +69,11 @@ set(RESCUE_SERVER_HDR
 	RescueServer.hpp
 	)
 
-add_library(rescue_server ${RESCUE_SERVER_SRC} ${RESCUE_SERVER_HDR})
-if (${BUILD_SHARED_LIBS})
-	target_compile_definitions(rescue_server PUBLIC -DRESCUE_SERVER_DLL)
-endif()
+add_executable(rescue_server ${RESCUE_SERVER_SRC} ${RESCUE_SERVER_HDR})
 
 target_link_libraries(rescue_server
-	PUBLIC
-	    rescue
-		moose_tools
-		Boost::boost
-	PRIVATE
-		mredis
-		Boost::thread
-		Boost::system
+	rescue
+	Boost::program_options
 )
 
 target_include_directories(rescue_server

@@ -148,7 +148,7 @@ const std::string poll_queue{
 	"local done = false "
 	"local cursor = '0' "
 	"repeat "
-	    "local result = redis.call('sscan', cursor, 'rsc:candidates') "
+	    "local result = redis.call('sscan', 'rsc:candidates', cursor) "
 	    "cursor = result[1] "
 	    "keys = result[2] "
 	    "for i, hash in ipairs(keys) do "
@@ -159,8 +159,8 @@ const std::string poll_queue{
 	            // This is the candidate we are looking for. Get the password associated with
 	            // it and create a lease
 
-	            "local enc_password = redis.call('get', 'rsc:passwords', hash) "
-	            "redis.call('set', lease_key, enc_password, 'EX', '60) "
+	            "local enc_password = redis.call('hget', 'rsc:passwords', hash) "
+	            "redis.call('set', lease_key, enc_password, 'EX', '60') "
 	            "return enc_password "
 	        "end "
 	    "end "
@@ -219,7 +219,7 @@ const std::string return_lease{
 	"if redis.call('exists', KEYS[1]) == 0 then "
 	    "if ARGV[2] == '1' then "
 	        "redis.call('sadd', 'rsc:success', ARGV[1]) "
-	    "endif "
+	    "end "
 	    "return -1 "
 	"end "
 
@@ -231,7 +231,7 @@ const std::string return_lease{
 	    "redis.call('sadd', 'rsc:success', ARGV[1]) "    // YYYYYEEEEEAAAAAAAHHHHHHH!!!!!
 	"else "
 	    "redis.call('sadd', 'rsc:failed', ARGV[1]) "
-	"endif "
+	"end "
 	"return 0 "
 };
 

@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 	desc.add_options()
 	    ("help,h",   "Print this help message")
 	    ("server,s", po::value<std::string>()->default_value("127.0.0.1"), "give redis server ip")
-	    ("file,f",   po::value<std::string>()->default_value("candidates.txt"), "input file name");
+	    ("file,f",   po::value<std::string>()->default_value("luks_header"), "input file name");
 
 	try {
 		po::variables_map vm;
@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 		// Check the file for accessibility
 		boost::system::error_code errc;
 
-		if (fs::is_regular_file(filename, errc) || errc) {
+		if (!fs::is_regular_file(filename, errc) || errc) {
 			std::cerr << "Could not access LUKS header file '" << filename << "': " << errc;
 			return EXIT_FAILURE;
 		}

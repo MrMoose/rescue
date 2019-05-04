@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(OneStringPerms) {
 #endif
 
 
-BOOST_AUTO_TEST_CASE(Diverse) {
+BOOST_AUTO_TEST_CASE(Diverse_1) {
 
 	const std::string input("Hi [wo|rl]!");
 

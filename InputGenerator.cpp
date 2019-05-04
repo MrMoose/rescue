@@ -104,8 +104,6 @@ std::vector<std::string> recurse_permutations(const std::list<token> &n_remains)
 	TokenVisitor v;
 	boost::apply_visitor(v, remains.front());
 
-	// Add all of them to the destination vector plus the
-
 	remains.pop_front();
 
 	// If we reached the last of tokens, we return all permutations of it
@@ -131,13 +129,11 @@ std::vector<std::string> recurse_permutations(const std::list<token> &n_remains)
 	}
 }
 
-
-
-
-
-
-
 std::size_t generate_permutations(const std::string &n_input, std::vector<std::string> &n_output) {
+
+	if (n_input.empty()) {
+		return 0;
+	}
 
 	const std::list<token> tokens = parse_input_string(n_input);
 

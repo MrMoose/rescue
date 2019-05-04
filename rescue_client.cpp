@@ -80,6 +80,10 @@ int main(int argc, char **argv) {
 
 		for (std::string line; std::getline(ifile, line); ) {
 
+			if (line.empty()) {
+				continue;
+			}
+
 			std::cout << "Crunching input: " << line << std::endl;
 
 			std::vector<std::string> permutations;
@@ -93,19 +97,10 @@ int main(int argc, char **argv) {
 
 			// Now do that again with an added tokens "Master"
 			permutations.clear();
-			num = generate_permutations(line + " [Master|Slave]", permutations);
+			num = generate_permutations(line + " [Master|Slave] [1|2]", permutations);
 			std::cout << " yielded " << num << " permutations plus 'Master'. Inserting them into Q...." << std::endl;
 			for (const std::string &candidate : permutations) {
-				std::cout << "queing " << candidate << std::endl;
-				queue_candidate(redis, candidate);
-			}
-
-			permutations.clear();
-			num = generate_permutations(line + " [Master|Slave] 1", permutations);
-			std::cout << " yielded " << num << " permutations plus 'Master'. Inserting them into Q...." << std::endl;
-
-			for (const std::string &candidate : permutations) {
-				std::cout << "queing " << candidate << std::endl;
+				std::cout << "queing '" << candidate << "'" << std::endl;
 				queue_candidate(redis, candidate);
 			}
 		}
