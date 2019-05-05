@@ -75,6 +75,8 @@ int main(int argc, char **argv) {
 			return EXIT_FAILURE;
 		}
 
+		std::uint32_t count = 0;
+
 		// Open input file and read line by line, parse and enter into work queue
 		fs::ifstream ifile(infile, std::ios::in);
 
@@ -92,20 +94,25 @@ int main(int argc, char **argv) {
 
 			for (const std::string &candidate : permutations) {
 				std::cout << "queing " << candidate << std::endl;
-				queue_candidate(redis, candidate);
+				if (queue_candidate(redis, candidate)) {
+					count++;
+				}
 			}
 
 			// Now do that again with an added tokens "Master"
 			permutations.clear();
-			num = generate_permutations(line + " [Master|Slave] [1|2]", permutations);
+			//num = generate_permutations(line + " [Master|Slave] [1|2]", permutations);
+			num = generate_permutations(line + " Master [1|2]", permutations);
 			std::cout << " yielded " << num << " permutations plus 'Master'. Inserting them into Q...." << std::endl;
 			for (const std::string &candidate : permutations) {
 				std::cout << "queing '" << candidate << "'" << std::endl;
-				queue_candidate(redis, candidate);
+				if (queue_candidate(redis, candidate)) {
+					count++;
+				}
 			}
 		}
 
-		std::cout << "done" << std::endl;
+		std::cout << "done, " << count << " candidates inserted" << std::endl;
 
 		return EXIT_SUCCESS;
 

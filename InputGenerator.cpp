@@ -57,8 +57,13 @@ void case_permutations(const std::string &n_input, std::vector<std::string> &n_o
 	uppercase[0] = std::toupper(uppercase[0], loc);
 	lowercase[0] = std::tolower(lowercase[0], loc);
 
-	n_output.emplace_back(uppercase);
-	n_output.emplace_back(lowercase);
+	// They might be the same, in case of numerics or special characters
+	if (uppercase != lowercase) {
+		n_output.emplace_back(uppercase);
+		n_output.emplace_back(lowercase);
+	} else {
+		n_output.emplace_back(uppercase);
+	}
 
 #else
     #pragma message ("Alnum token behavior undefined.")
